@@ -30,11 +30,7 @@ class PatientResource extends Resource
 
                 Forms\Components\Select::make('type')
                     ->label(__('Type'))
-                    ->options([
-                        'cat' => 'Cat',
-                        'dog' => 'Dog',
-                        'rabbit' => 'Rabbit',
-                    ])
+                    ->options(Patient::typeMap())
                     ->required(),
                 Forms\Components\DatePicker::make('date_of_birth')
                     ->label(__('Date of birth'))
@@ -47,19 +43,20 @@ class PatientResource extends Resource
                     ->preload()
                     ->createOptionForm([
                         Forms\Components\TextInput::make('name')
+                            ->label(__('Name'))
                             ->required()
                             ->maxLength(255),
                         Forms\Components\TextInput::make('email')
-                            ->label('Email address')
+                            ->label(__('Email'))
                             ->email()
                             ->required()
                             ->maxLength(255),
                         Forms\Components\TextInput::make('phone')
-                            ->label('Phone number')
+                            ->label(__('Phone number'))
                             ->tel()
                             ->required(),
                     ])
-                    ->required()
+                    ->required(),
             ]);
     }
 
@@ -67,12 +64,11 @@ class PatientResource extends Resource
     {
         return $table
             ->columns([
-
                 Tables\Columns\TextColumn::make('name')
                     ->label(__('Name'))
                     ->searchable(),
                 Tables\Columns\TextColumn::make('type')
-                        ->label(__('Type')),
+                    ->label(__('Type')),
                 Tables\Columns\TextColumn::make('date_of_birth')
                     ->label(__('Date of birth'))
                     ->sortable(),

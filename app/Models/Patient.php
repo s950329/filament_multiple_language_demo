@@ -9,6 +9,12 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Patient extends BaseModel
 {
+    use Translatable;
+
+    const TYPE_DOG = 'dog';
+    const TYPE_CAT = 'cat';
+    const TYPE_RABBIT = 'rabbit';
+
     protected $fillable = [
         'date_of_birth',
         'name',
@@ -24,5 +30,14 @@ class Patient extends BaseModel
     public function treatments(): HasMany
     {
         return $this->hasMany(Treatment::class);
+    }
+
+    public static function typeMap()
+    {
+        return [
+            self::TYPE_DOG => __('Dog'),
+            self::TYPE_CAT => __('Cat'),
+            self::TYPE_RABBIT => __('Rabbit'),
+        ];
     }
 }

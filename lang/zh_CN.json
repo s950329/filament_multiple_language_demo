@@ -50,5 +50,11 @@
     "Created at": "创建于",
     "Cats": "猫",
     "Dogs": "狗",
-    "Rabbits": "兔子"
+    "Rabbits": "兔子",
+    "Dog": "狗",
+    "Cat": "猫",
+    "Rabbit":  "兔子",
+    "Translations": "翻译",
+    "Phone number": "手机号码",
+    "Email": "邮箱"
 }
