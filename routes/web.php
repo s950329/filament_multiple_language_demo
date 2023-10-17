@@ -14,12 +14,5 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    $patient = \App\Models\Patient::first();
-
-    $patient->translations()->updateOrCreate([
-        'locale' => 'en',
-        'column' => 'name',
-    ], [
-        'value' => 'Yellow',
-    ]);
+    return 'Hello, world!';
 });
