@@ -1,6 +1,9 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Traits;
+
+use App\Models\BaseModel;
+use App\Models\Translation;
 
 trait Translatable
 {

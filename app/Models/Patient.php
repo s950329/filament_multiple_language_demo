@@ -2,8 +2,7 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use App\Models\Traits\Translatable;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
@@ -16,9 +15,9 @@ class Patient extends BaseModel
     const TYPE_RABBIT = 'rabbit';
 
     protected $fillable = [
+        'owner_id',
         'date_of_birth',
         'name',
-        'owner_id',
         'type',
     ];
 
