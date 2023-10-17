@@ -68,7 +68,8 @@ class PatientResource extends Resource
                     ->label(__('Name'))
                     ->searchable(),
                 Tables\Columns\TextColumn::make('type')
-                    ->label(__('Type')),
+                    ->label(__('Type'))
+                    ->formatStateUsing(fn (string $state): string => Patient::typeMap()[$state] ?? $state),
                 Tables\Columns\TextColumn::make('date_of_birth')
                     ->label(__('Date of birth'))
                     ->sortable(),
