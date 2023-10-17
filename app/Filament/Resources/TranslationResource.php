@@ -86,7 +86,8 @@ class TranslationResource extends Resource
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('locale')
-                    ->label(__('Locale')),
+                    ->label(__('Locale'))
+                    ->formatStateUsing(fn($state, $record): string => Translation::localeMap()[$state] ?? $state),
                 Tables\Columns\TextColumn::make('column')
                     ->label(__('Column'))
                     ->formatStateUsing(fn($state, $record): string => $record->translatable->getTranslatableColumns()[$state] ?? $state),
