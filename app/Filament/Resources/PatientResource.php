@@ -24,10 +24,12 @@ class PatientResource extends Resource
         return $form
             ->schema([
                 Forms\Components\TextInput::make('name')
+                    ->label(__('Name'))
                     ->required()
                     ->maxLength(255),
 
                 Forms\Components\Select::make('type')
+                    ->label(__('Type'))
                     ->options([
                         'cat' => 'Cat',
                         'dog' => 'Dog',
@@ -35,9 +37,11 @@ class PatientResource extends Resource
                     ])
                     ->required(),
                 Forms\Components\DatePicker::make('date_of_birth')
+                    ->label(__('Date of birth'))
                     ->required()
                     ->maxDate(now()),
                 Forms\Components\Select::make('owner_id')
+                    ->label(__('Owner'))
                     ->relationship('owner', 'name')
                     ->searchable()
                     ->preload()
@@ -65,11 +69,15 @@ class PatientResource extends Resource
             ->columns([
 
                 Tables\Columns\TextColumn::make('name')
+                    ->label(__('Name'))
                     ->searchable(),
-                Tables\Columns\TextColumn::make('type'),
+                Tables\Columns\TextColumn::make('type')
+                        ->label(__('Type')),
                 Tables\Columns\TextColumn::make('date_of_birth')
+                    ->label(__('Date of birth'))
                     ->sortable(),
                 Tables\Columns\TextColumn::make('owner.name')
+                    ->label(__('Owner'))
                     ->searchable(),
             ])
             ->filters([
@@ -104,5 +112,10 @@ class PatientResource extends Resource
             'create' => Pages\CreatePatient::route('/create'),
             'edit' => Pages\EditPatient::route('/{record}/edit'),
         ];
+    }
+
+    public static function getLabel(): string
+    {
+        return __('Patients');
     }
 }
