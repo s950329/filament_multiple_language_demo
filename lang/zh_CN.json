@@ -61,5 +61,6 @@
     "Translatable ID": "翻译目标",
     "Locale": "语言",
     "Column": "字段",
-    "Value": "值"
+    "Value": "值",
+    "Translation Form": "翻译表单"
 }

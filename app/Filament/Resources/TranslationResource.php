@@ -8,6 +8,7 @@ use App\Models\Translation;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
+use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -32,6 +33,7 @@ class TranslationResource extends Resource
                     })
                     ->required()
                     ->live(),
+
                 Forms\Components\Select::make('translatable_id')
                     ->label(__('Translatable ID'))
                     ->options(function (Get $get) {
@@ -44,23 +46,58 @@ class TranslationResource extends Resource
                     })
                     ->searchable()
                     ->preload()
-                    ->required(),
+                    ->required()
+                    ->live()
+                    ->afterStateUpdated(function (Get $get, Set $set) {
+                        // 如果同时存在的话，就把翻译的值赋值给表单
+                        if ($get('translatable_type') && $get('translatable_id') && $get('locale')) {
+                            $model = $get('translatable_type')::with(['translations' => function ($query) use ($get) {
+                                $query->where('locale', $get('locale'));
+                            }])->find($get('translatable_id'));
+
+                            if ($model->translations->count()) {
+                                foreach ($model->translations as $translation) {
+                                    $set($translation->column, $translation->value);
+                                }
+                            } else {
+                                foreach ($get('translatable_type')::getTranslatableColumns() as $column => $val) {
+                                    $set($column, null);
+                                };
+                            }
+                        }
+                    }),
+
                 Forms\Components\Select::make('locale')
                     ->label(__('Locale'))
                     ->options(Translation::localeMap())
-                    ->required(),
-                Forms\Components\Select::make('column')
-                    ->label(__('Column'))
-                    ->options(function (Get $get) {
-                        return $get('translatable_type') ?
-                            $get('translatable_type')::getTranslatableColumns() : [];
-                    })
-                    ->required(),
-                Forms\Components\Textarea::make('value')
-                    ->label(__('Value'))
                     ->required()
-                    ->maxLength(255)
-                    ->columnSpan('full'),
+                    ->live()
+                    ->afterStateUpdated(function(Get $get, Set $set) {
+                        if ($get('translatable_type') && $get('translatable_id') && $get('locale')) {
+                            $model = $get('translatable_type')::with(['translations' => function ($query) use ($get) {
+                                $query->where('locale', $get('locale'));
+                            }])->find($get('translatable_id'));
+
+                            if ($model->translations->count()) {
+                                foreach ($model->translations as $translation) {
+                                    $set($translation->column, $translation->value);
+                                }
+                            } else {
+                                foreach ($get('translatable_type')::getTranslatableColumns() as $column => $val) {
+                                    $set($column, null);
+                                };
+                            }
+                        }
+                    }),
+
+                Forms\Components\Section::make(__('Translation Form'))
+                    ->schema([
+                        Forms\Components\TextInput::make('name')
+                            ->label(__('Name'))
+                            ->required()
+                            ->maxLength(255),
+                    ])
+                    ->hidden(fn(Get $get) => $get('translatable_type') != Patient::class),
             ]);
     }
 
@@ -73,6 +110,7 @@ class TranslationResource extends Resource
                     ->formatStateUsing(fn(string $state): string => Translation::translatableMap()[$state] ?? $state)
                     ->searchable()
                     ->sortable(),
+
                 Tables\Columns\TextColumn::make('translatable_id')
                     ->label(__('Translatable ID'))
                     ->formatStateUsing(function (?Model $record) {
@@ -85,15 +123,10 @@ class TranslationResource extends Resource
                     })
                     ->searchable()
                     ->sortable(),
+
                 Tables\Columns\TextColumn::make('locale')
                     ->label(__('Locale'))
                     ->formatStateUsing(fn($state, $record): string => Translation::localeMap()[$state] ?? $state),
-                Tables\Columns\TextColumn::make('column')
-                    ->label(__('Column'))
-                    ->formatStateUsing(fn($state, $record): string => $record->translatable->getTranslatableColumns()[$state] ?? $state),
-                Tables\Columns\TextColumn::make('value')
-                    ->label(__('Value'))
-                    ->words(10),
             ])
             ->filters([
                 //
@@ -127,5 +160,10 @@ class TranslationResource extends Resource
     public static function getLabel(): ?string
     {
         return __('Translations');
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->groupBy('translatable_id', 'translatable_type', 'locale');
     }
 }
