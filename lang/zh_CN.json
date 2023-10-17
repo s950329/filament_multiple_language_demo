@@ -56,5 +56,10 @@
     "Rabbit":  "兔子",
     "Translations": "翻译",
     "Phone number": "手机号码",
-    "Email": "邮箱"
+    "Email": "邮箱",
+    "Translatable Type": "翻译类型",
+    "Translatable ID": "翻译目标",
+    "Locale": "语言",
+    "Column": "字段",
+    "Value": "值"
 }

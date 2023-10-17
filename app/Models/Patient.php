@@ -40,4 +40,11 @@ class Patient extends BaseModel
             self::TYPE_RABBIT => __('Rabbit'),
         ];
     }
+
+    public static function getTranslatableColumns()
+    {
+        return [
+            'name' => __('Name'),
+        ];
+    }
 }

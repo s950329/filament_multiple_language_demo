@@ -3,14 +3,16 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\TranslationResource\Pages;
-use App\Filament\Resources\TranslationResource\RelationManagers;
+use App\Models\Patient;
 use App\Models\Translation;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class TranslationResource extends Resource
@@ -25,23 +27,40 @@ class TranslationResource extends Resource
             ->schema([
                 Forms\Components\Select::make('translatable_type')
                     ->label(__('Translatable Type'))
-                    ->required(),
-                Forms\Components\TextInput::make('translatable_id')
+                    ->options(function () {
+                        return Translation::translatableMap();
+                    })
+                    ->required()
+                    ->live(),
+                Forms\Components\Select::make('translatable_id')
                     ->label(__('Translatable ID'))
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('locale')
+                    ->options(function (Get $get) {
+                        switch ($get('translatable_type')) {
+                            case Patient::class:
+                                return Patient::all()->pluck('name', 'id');
+                            default:
+                                return [];
+                        }
+                    })
+                    ->searchable()
+                    ->preload()
+                    ->required(),
+                Forms\Components\Select::make('locale')
                     ->label(__('Locale'))
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('column')
+                    ->options(Translation::localeMap())
+                    ->required(),
+                Forms\Components\Select::make('column')
                     ->label(__('Column'))
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('value')
+                    ->options(function (Get $get) {
+                        return $get('translatable_type') ?
+                            $get('translatable_type')::getTranslatableColumns() : [];
+                    })
+                    ->required(),
+                Forms\Components\Textarea::make('value')
                     ->label(__('Value'))
                     ->required()
-                    ->maxLength(255),
+                    ->maxLength(255)
+                    ->columnSpan('full'),
             ]);
     }
 
@@ -51,12 +70,28 @@ class TranslationResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('translatable_type')
                     ->label(__('Translatable Type'))
+                    ->formatStateUsing(fn(string $state): string => Translation::translatableMap()[$state] ?? $state)
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('translatable_id'),
-                Tables\Columns\TextColumn::make('locale'),
-                Tables\Columns\TextColumn::make('column'),
+                Tables\Columns\TextColumn::make('translatable_id')
+                    ->label(__('Translatable ID'))
+                    ->formatStateUsing(function (?Model $record) {
+                        switch (get_class($record->translatable)) {
+                            case Patient::class:
+                                return $record->translatable->name;
+                            default:
+                                return $record->translatable_id;
+                        }
+                    })
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('locale')
+                    ->label(__('Locale')),
+                Tables\Columns\TextColumn::make('column')
+                    ->label(__('Column'))
+                    ->formatStateUsing(fn($state, $record): string => $record->translatable->getTranslatableColumns()[$state] ?? $state),
                 Tables\Columns\TextColumn::make('value')
+                    ->label(__('Value'))
                     ->words(10),
             ])
             ->filters([
