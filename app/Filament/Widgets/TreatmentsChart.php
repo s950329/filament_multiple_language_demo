@@ -6,11 +6,10 @@ use App\Models\Treatment;
 use Filament\Widgets\ChartWidget;
 use Flowframe\Trend\Trend;
 use Flowframe\Trend\TrendValue;
+use Illuminate\Contracts\Support\Htmlable;
 
 class TreatmentsChart extends ChartWidget
 {
-    protected static ?string $heading = 'Treatments';
-
     protected function getData(): array
     {
         $data = Trend::model(Treatment::class)
@@ -35,5 +34,10 @@ class TreatmentsChart extends ChartWidget
     protected function getType(): string
     {
         return 'line';
+    }
+
+    public function getHeading(): string|Htmlable|null
+    {
+        return __('Treatments');
     }
 }

@@ -11,9 +11,12 @@ class PatientTypeOverview extends BaseWidget
     protected function getStats(): array
     {
         return [
-            Stat::make('Cats', Patient::query()->where('type', 'cat')->count()),
-            Stat::make('Dogs', Patient::query()->where('type', 'dog')->count()),
-            Stat::make('Rabbits', Patient::query()->where('type', 'rabbit')->count()),
+            Stat::make('Cats', Patient::query()->where('type', 'cat')->count())
+                ->label(__('Cats')),
+            Stat::make('Dogs', Patient::query()->where('type', 'dog')->count())
+                ->label(__('Dogs')),
+            Stat::make('Rabbits', Patient::query()->where('type', 'rabbit')->count())
+                ->label(__('Rabbits')),
         ];
     }
 }

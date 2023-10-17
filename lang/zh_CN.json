@@ -47,5 +47,8 @@
     "Description": "描述",
     "Notes": "备注",
     "Price":  "金额",
-    "Created at": "创建于"
+    "Created at": "创建于",
+    "Cats": "猫",
+    "Dogs": "狗",
+    "Rabbits": "兔子"
 }
